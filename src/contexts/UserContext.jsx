@@ -1,25 +1,19 @@
-import { createContext, useState } from 'react';
+import { createContext, useState, useEffect } from 'react';
 
-const UserContext = createContext();
+export const UserContext = createContext();
 
-const getUserFromToken = () => {
-  const token = localStorage.getItem('token');
+export const UserProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
 
-  if (!token) return null;
-
-  return JSON.parse(atob(token.split('.')[1])).payload;
-};
-
-function UserProvider({ children }) {
-  const [user, setUser] = useState(getUserFromToken());
-
-  const value = { user, setUser };
+  
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) setUser(JSON.parse(savedUser));
+  }, []);
 
   return (
-    <UserContext.Provider value={value}>
+    <UserContext.Provider value={{ user, setUser }}>
       {children}
     </UserContext.Provider>
   );
 };
-
-export { UserProvider, UserContext };
